@@ -47,15 +47,21 @@ if [ $choice -eq 1 ]; then
   # Encryption
   openssl enc -aes-256-cbc -salt -in "$filepath" -out "${filepath}.enc" -K "$hexkey" -iv "00000000000000000000000000000000"
   echo "| Encryption complete: ${filepath}.enc"
-  echo "| Encrypted content:"
-  cat "${filepath}.enc"
+  # Delete the original file after encryption
+  rm "$filepath"
+  echo "| Original file deleted."
 elif [ $choice -eq 2 ]; then
   # Decryption
-  openssl enc -d -aes-256-cbc -in "$filepath" -out "${filepath%.enc}.dec" -K "$hexkey" -iv "00000000000000000000000000000000"
-  echo "| Decryption complete: ${filepath%.enc}.dec"
+  # Determine the original file name by removing the '.enc' extension
+  original_filename="${filepath%.enc}"
+  openssl enc -d -aes-256-cbc -in "$filepath" -out "$original_filename" -K "$hexkey" -iv "00000000000000000000000000000000"
+  echo "| Decryption complete: $original_filename"
+  # Delete the encrypted file after decryption
+  rm "$filepath"
+  echo "| Encrypted file deleted."
   echo "| Decrypted content:"
-  cat "${filepath%.enc}.dec"
+  cat "$original_filename"
+  echo ""
 fi
 
-echo ""
 echo "======================================"
